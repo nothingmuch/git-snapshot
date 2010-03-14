@@ -1,0 +1,60 @@
+#!/bin/bash
+
+USAGE="git snapshot [ref] [snapshot-ref]"
+
+. "$(git --exec-path)/git-sh-setup"
+
+require_work_tree
+cd_to_toplevel
+
+cd "$( git rev-parse --show-cdup )"
+
+src_ref="${1:-HEAD}"
+ref="${2:-refs/snapshots/$src_ref}"
+
+msg="$(date)" # FIXME add a way to override this
+
+cur="$( git snapshot-tree )"
+
+parents=""
+
+if git rev-parse --quiet --verify --no-revs "$ref"; then
+	prev_commit="$(git rev-parse --quiet "$ref")"
+
+	# the tree of the previous snapshot
+	prev="$( git rev-parse ${prev_commit}: )"
+
+	# if we got this far then there were changes in the tree that should be
+	# recorded
+
+	# check if there's a $src_ref revision (not an empty repo)
+	if git rev-parse --quiet --verify --no-revs "$src_ref"; then
+		head="$(git rev-parse --quiet "$src_ref")"
+
+		# check if the last snapshot already descends from it
+		if [ "$(git merge-base $prev_commit $head)" != "$head" ]; then
+			# if not, then list it as a parent
+			parents="-p $head"
+		fi
+	fi
+
+	if [ "$prev" = "$cur" -a -z "$parents" ]; then
+		# the current tree is already snapshotted, and there have been no new
+		# commits, so we can skip
+		exit;
+	fi
+
+	commit="$( git commit-tree "$cur" -p $prev_commit $parents <<<"$msg" )"
+	git update-ref -m "new snapshot" "$ref" $commit $prev_commit
+else
+	# we're recording the first snapshot
+
+	# first, if there's a revision in $src_ref (i.e. we're not in an empty repo), 
+	# we want to use that as a parent
+	if git rev-parse --quiet --verify --no-revs "$src_ref"; then
+		parents="-p $(git rev-parse --quiet "$src_ref")"
+	fi
+
+	commit="$( git commit-tree $cur $parents <<<"$msg" )"
+	git update-ref -m "new snapshot" "$ref" $commit
+fi

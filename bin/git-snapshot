@@ -1,0 +1,15 @@
+#!/bin/bash
+
+USAGE="git snapshot"
+
+. "$(git --exec-path)/git-sh-setup"
+
+require_work_tree
+
+git snapshot-ref HEAD
+
+symref="$( git symbolic-ref --quiet HEAD )"
+
+if [ -n "$symref" ]; then
+	git snapshot-ref "$symref"
+fi

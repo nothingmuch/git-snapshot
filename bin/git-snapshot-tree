@@ -1,0 +1,17 @@
+#!/bin/bash
+
+USAGE="git snapshot-tree"
+
+. "$(git --exec-path)/git-sh-setup"
+
+require_work_tree
+cd_to_toplevel
+
+GIT_INDEX=${TMPDIR:-/tmp}/git_snapshot_index_$$
+export GIT_INDEX
+
+# snapshot everything not in .gitignore
+git add --all
+
+# record the index in the object database
+git write-tree
