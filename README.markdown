@@ -70,6 +70,20 @@ version from the snapshot history:
 	git log refs/snapshots/...
 	git checkout refs/snapshots/...:the/file/i/want.txt
 
+## With Spotlight
+
+On MacOS X you can use the Finder's _Get Info_ dialogue to add a spotlight
+comment or a label to project directories.
+
+Then you can use one of the following commands in your crontab to automatically
+snapshot it:
+
+	# snapshot every directory with 'git-snapshot' in its comment
+	mdfind -0 "kMDItemFinderComment == '*git-snapshot*'" | xargs -0 -n 1 git-snapshot
+
+	# snapshot every directory under ~/code that has the red label
+	mdfind -0 -onlyin ~/code "kMDItemFSLabel == 6" | xargs -0 -n 1 git-snapshot
+
 ## See Also
 
 - `git help rev-parse` for specifying time based revisions (e.g.
