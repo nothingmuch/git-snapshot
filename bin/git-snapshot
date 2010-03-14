@@ -1,10 +1,13 @@
 #!/bin/bash
 
-USAGE="git snapshot"
+if [ -n  "$1" ]; then
+	cd "$1";
+fi
+
+USAGE="git snapshot [repo]"
+SUBDIRECTORY_OK=1
 
 . "$(git --exec-path)/git-sh-setup"
-
-require_work_tree
 
 git snapshot-ref HEAD
 

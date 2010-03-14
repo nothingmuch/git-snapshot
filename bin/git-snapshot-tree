@@ -1,6 +1,7 @@
 #!/bin/bash
 
 USAGE="git snapshot-tree"
+SUBDIRECTORY_OK=1
 
 . "$(git --exec-path)/git-sh-setup"
 
