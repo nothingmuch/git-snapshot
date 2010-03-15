@@ -8,8 +8,8 @@ SUBDIRECTORY_OK=1
 require_work_tree
 cd_to_toplevel
 
-GIT_INDEX=${TMPDIR:-/tmp}/git_snapshot_index_$$
-export GIT_INDEX
+GIT_INDEX_FILE=${TMPDIR:-/tmp}/git_snapshot_index_$$
+export GIT_INDEX_FILE
 
 # snapshot everything not in .gitignore
 git add --all
